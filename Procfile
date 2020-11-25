@@ -1,1 +1,1 @@
-web: gunicorn bayesbeat.wsgi --log-file -
+web: gunicorn Bayesbeat.wsgi --log-file -

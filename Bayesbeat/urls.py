@@ -8,7 +8,6 @@ import os
 
 
 urlpatterns = [
-    # path(os.getenv('ADMIN_URL')+'/', admin.site.urls),
-
+    path('admin/', admin.site.urls),
     path('profile/', include('user_profile.urls', namespace='user_profile')),
 ]

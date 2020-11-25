@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+import django_heroku
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'user_profile',
 ]
 
 MIDDLEWARE = [
@@ -114,20 +117,27 @@ USE_L10N = True
 USE_TZ = True
 
 
+# CORS settings
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = [
+    'http://127.0.0.1:8000',
+    'https://localhost:8080',
+    'http://0.0.0.0:5000',
+    'https://bayesbeat.herokuapp.com'
+]
+
+
+# CSRF settings
+CSRF_TRUSTED_ORIGINS = [
+    'https://bayesbeat.herokuapp.com'
+
+]
+
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = "/static/"
+django_heroku.settings(locals())
 
-STATIC_URL = '/static/'
-# if DEBUG:
-#    STATICFILES_DIRS = [
-#    os.path.join(BASE_DIR, 'static'),
-#    ]
-# else:
-STATIC_ROOT = os.path.join(BASE_DIR,'static')
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATIC_TMP = os.path.join(BASE_DIR, 'static')
-
-os.makedirs(STATIC_TMP, exist_ok=True)
-os.makedirs(STATIC_ROOT, exist_ok=True)

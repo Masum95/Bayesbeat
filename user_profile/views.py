@@ -6,9 +6,7 @@ from .serializers import MyFileSerializer
 
 
 class MyFileView(APIView):
-    # MultiPartParser AND FormParser
-    # https://www.django-rest-framework.org/api-guide/parsers/#multipartparser
-    # "You will typically want to use both FormParser and MultiPartParser together in order to fully support HTML form data."
+
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):

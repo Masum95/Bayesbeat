@@ -1,1 +1,1 @@
-web: gunicorn buetian.wsgi --log-file -
+web: gunicorn Bayesbeat.wsgi --log-file -

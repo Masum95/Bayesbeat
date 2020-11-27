@@ -2,7 +2,6 @@
   "name": "BUETian Database Backend",
   "description": "Django Rest backend for BUETian daatabse",
   "image": "heroku/python",
-  "repository": "https://github.com/bsadd/buetian/",
   "keywords": ["python", "django"],
   "addons": ["heroku-postgresql"],
   "env": {

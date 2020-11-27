@@ -147,7 +147,6 @@ REST_FRAMEWORK = {
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = "/static/"
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # integrate heroku with django
 django_heroku.settings(locals())

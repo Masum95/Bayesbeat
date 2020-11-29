@@ -6,15 +6,27 @@ from rest_framework import status
 
 from .models import MyFile
 from .serializers import MyFileSerializer
+from user_profile import pagination
 
 
 class MyFileView(ListCreateAPIView):
 
     parser_classes = (MultiPartParser, FormParser)
     serializer_class = MyFileSerializer
+    pagination_class = pagination.CustomPagination
 
     def get_queryset(self):
-        return MyFile.objects.all()
+        return MyFile.objects.all().order_by('-timestamp')
+
+    def filter_queryset(self, queryset):
+        query_params = self.request.query_params
+        if 'start_time' in query_params:
+            queryset = queryset.get_after_time(start_time=query_params.get('start_time'))
+        if 'end_time' in query_params:
+            queryset = queryset.get_before_time(end_time=query_params.get('end_time'))
+        if 'device_id' in query_params:
+            queryset = queryset.filter(device_id=query_params.get('device_id'))
+        return queryset
 
     def post(self, request, *args, **kwargs):
         file_serializer = MyFileSerializer(data=request.data)

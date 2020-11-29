@@ -1,10 +1,10 @@
 import requests
 
 
-# files = {'file': open('sample.pdf', 'rb')}
-files = {'file': open('_nf8VNRdtlCse1yloaZqM0ykXQA-001_1606507067.csv', 'rb')}
+files = {'file': open('sample.pdf', 'rb')}
+# files = {'file': open('_nf8VNRdtlCse1yloaZqM0ykXQA-001_1606507067.csv', 'rb')}
 
-values = {'device_id': 'd_1234', 'timestamp':'1606507067'}
+values = {'device_id': 'd_1234', 'timestamp':'1606507099'}
 
 
 # url = 'https://bayesbeat.herokuapp.com/file/upload/'

@@ -131,3 +131,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+
+*.csv
+
+bayesbeat-35448e214e71.json

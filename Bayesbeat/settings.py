@@ -82,6 +82,8 @@ DATABASES = {
     }
 }
 
+GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = 'bayesbeat-35448e214e71.json'
+GOOGLE_DRIVE_STORAGE_MEDIA_ROOT = 'bayesbeat_database/' # OPTIONAL
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

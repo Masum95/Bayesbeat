@@ -2,10 +2,14 @@ from django.db import models
 
 from Bayesbeat.settings import MEDIA_ROOT
 from user_profile.querysets import FileQuerySet
+from gdstorage.storage import GoogleDriveStorage
 
+# Define Google Drive Storage
+gd_storage = GoogleDriveStorage()
 
 class MyFile(models.Model):
-    file = models.FileField( blank=False, null=False, unique=True)
+
+    file = models.FileField(upload_to='', blank=False, null=False, unique=True, storage=gd_storage)
     file_name = models.CharField(max_length=75)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now_add=False)

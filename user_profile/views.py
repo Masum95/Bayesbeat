@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -6,7 +7,7 @@ from rest_framework import status
 
 from .models import MyFile
 from .serializers import MyFileSerializer
-from user_profile import pagination
+from user_profile import pagination, enums
 
 
 class MyFileView(ListCreateAPIView):
@@ -19,6 +20,7 @@ class MyFileView(ListCreateAPIView):
         return MyFile.objects.all().order_by('-timestamp')
 
     def filter_queryset(self, queryset):
+        print(enums.FileSourceChoices.WATCH.name)
         query_params = self.request.query_params
         if 'start_time' in query_params:
             queryset = queryset.get_after_time(start_time=query_params.get('start_time'))
@@ -26,6 +28,9 @@ class MyFileView(ListCreateAPIView):
             queryset = queryset.get_before_time(end_time=query_params.get('end_time'))
         if 'device_id' in query_params:
             queryset = queryset.filter(device_id=query_params.get('device_id'))
+        if 'selective' in query_params:
+            queryset = queryset.filter(file_src=enums.FileSourceChoices.WATCH.name).filter(has_sent_to_mobile=False)
+
         return queryset
 
     def post(self, request, *args, **kwargs):
@@ -35,3 +40,16 @@ class MyFileView(ListCreateAPIView):
             return Response(file_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def file_ack_view(request):
+
+    query_params = request.GET
+
+    file_list_string = query_params.get('file_list')
+    file_list = file_list_string.split(',')[:-1]
+    files = MyFile.objects.filter(file_name__in=file_list)
+    files.update(has_sent_to_mobile=True)
+    files.save()
+
+    return JsonResponse({'message': 'Success'})

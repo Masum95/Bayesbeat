@@ -11,5 +11,7 @@ app_name = 'user_profile'
 
 urlpatterns = [
 
-    path('upload/', MyFileView.as_view(), name='home')
+    path('upload/', MyFileView.as_view(), name='home'),
+    path('ack/', file_ack_view, name='ack')
+
 ]

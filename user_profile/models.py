@@ -1,6 +1,7 @@
 from django.db import models
 
 from Bayesbeat.settings import MEDIA_ROOT
+from user_profile import enums
 from user_profile.querysets import FileQuerySet
 from gdstorage.storage import GoogleDriveStorage
 
@@ -14,6 +15,13 @@ class MyFile(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now_add=False)
     device_id = models.CharField(max_length=50)
+    has_sent_to_mobile = models.BooleanField(default=False)
+    file_src =  models.CharField(
+        max_length=6,
+        choices=enums.FileSourceChoices.choices,
+        default=enums.FileSourceChoices.WATCH,
+        blank=False
+    )
     objects = FileQuerySet.as_manager()
 
     def __str__(self):

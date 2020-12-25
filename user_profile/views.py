@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse
 from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.views import APIView
@@ -8,6 +10,8 @@ from rest_framework import status
 from .models import MyFile
 from .serializers import MyFileSerializer
 from user_profile import pagination, enums
+
+from django.views.decorators.csrf import csrf_exempt
 
 
 class MyFileView(ListCreateAPIView):
@@ -29,8 +33,8 @@ class MyFileView(ListCreateAPIView):
         if 'device_id' in query_params:
             queryset = queryset.filter(device_id=query_params.get('device_id'))
         if 'selective' in query_params:
-            queryset = queryset.filter(file_src=enums.FileSourceChoices.WATCH.name).filter(has_sent_to_mobile=False)
-
+            queryset = queryset.filter(file_src=enums.FileSourceChoices.WATCH).filter(has_sent_to_mobile=False)
+        print('here ' , queryset)
         return queryset
 
     def post(self, request, *args, **kwargs):
@@ -42,14 +46,23 @@ class MyFileView(ListCreateAPIView):
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@csrf_exempt
 def file_ack_view(request):
 
-    query_params = request.GET
+    query_params = request.POST
+    print('before ', request.body)
+    body_unicode = request.body.decode('utf-8')
+    print('here ', body_unicode)
+    body = json.loads(body_unicode)
+    content = body['file_list']
+    if len(content) == 0:
+        return JsonResponse({'message': 'Success'})
 
-    file_list_string = query_params.get('file_list')
-    file_list = file_list_string.split(',')[:-1]
+    file_list = content.split(',')[:-1]
     files = MyFile.objects.filter(file_name__in=file_list)
+    print(files)
     files.update(has_sent_to_mobile=True)
-    files.save()
+    for object in files:
+        object.save()
 
     return JsonResponse({'message': 'Success'})

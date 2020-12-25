@@ -8,6 +8,7 @@ from gdstorage.storage import GoogleDriveStorage
 # Define Google Drive Storage
 gd_storage = GoogleDriveStorage()
 
+
 class MyFile(models.Model):
 
     file = models.FileField(upload_to='', blank=False, null=False, unique=True, storage=gd_storage)

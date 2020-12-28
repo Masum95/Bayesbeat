@@ -25,7 +25,7 @@ class MyFileSerializer(serializers.ModelSerializer):
         return super(MyFileSerializer, self).to_internal_value(data)
 
     def create(self, validated_data):
-        print(validated_data['file'].name)
+        print('here in create ', validated_data['file'].name)
         obj = None
         try:
             obj = MyFile.objects.get(device_id=validated_data['device_id'], file_name=validated_data['file'].name)

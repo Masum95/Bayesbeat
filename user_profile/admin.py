@@ -2,6 +2,7 @@ from django.contrib import admin
 from user_profile import models
 
 admin.site.register(models.MyFile)
+admin.site.register(models.WatchDistributionModel)
 
 #
 # @admin.register(models.SupplyOrder)

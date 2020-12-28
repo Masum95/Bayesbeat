@@ -1,13 +1,16 @@
 import json
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
+from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.generics import ListCreateAPIView, ListAPIView
+from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import MyFile
+from .models import MyFile, WatchDistributionModel
 from .serializers import MyFileSerializer
 from user_profile import pagination, enums
 
@@ -32,6 +35,16 @@ class MyFileView(ListCreateAPIView):
             queryset = queryset.get_before_time(end_time=query_params.get('end_time'))
         if 'device_id' in query_params:
             queryset = queryset.filter(device_id=query_params.get('device_id'))
+        if 'phone_num' in query_params:
+            distribution = WatchDistributionModel.objects.get(phone=query_params.get('phone_num'))
+            device_id = distribution.watch_id
+            start_time = distribution.start_time
+            end_time = distribution.end_time
+            queryset = queryset.filter(device_id=device_id).get_after_time(start_time=start_time)
+
+            if end_time is not None:
+                queryset = queryset.get_before_time(end_time=end_time)
+
         if 'selective' in query_params:
             queryset = queryset.filter(file_src=enums.FileSourceChoices.WATCH).filter(has_sent_to_mobile=False)
         print('here ' , queryset)
@@ -66,3 +79,24 @@ def file_ack_view(request):
         object.save()
 
     return JsonResponse({'message': 'Success'})
+
+
+@api_view(('GET',))
+@renderer_classes(( JSONRenderer,))
+def isValidPHone(request):
+    query_params = request.GET
+    phone_num = query_params.get('phone_num')
+    print(phone_num)
+    distroDetails = None
+    try:
+        distroDetails = WatchDistributionModel.objects.get(phone=phone_num)
+        print('---------', distroDetails)
+
+        return JsonResponse({'status': "success", 'device_id': distroDetails.watch_id}, safe=False)  # or JsonResponse({'data': data})
+    except ObjectDoesNotExist:
+        print('nai ksu ')
+        # return Response({'status': 'details'}, status=status.HTTP_404_NOT_FOUND)
+
+        return JsonResponse({'status': "failure"}, safe=False)  # or JsonResponse({'data': data})
+
+

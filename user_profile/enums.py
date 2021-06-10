@@ -7,4 +7,19 @@ class FileSourceChoices(TextChoices):
     WATCH = 'WATCH', _('WATCH')
 
 
+class BloodGroupChoices(TextChoices):
+    ABP= 'AB+', 'AB+'
+    ABN = 'AB-', 'AB-'
+    AP = 'A+', 'A+'
+    AN = 'A-', 'A-'
+    BP = 'B+', 'B+'
+    BN = 'B-', 'B-'
+    OP = 'O+', 'O+'
+    ON = 'O-', 'O-'
+
+
+class GenderChoice(TextChoices):
+    MALE = 'M', _('Male')
+    FEMALE = 'F', _('Female')
+    OTHER = 'O', _('Other')
 

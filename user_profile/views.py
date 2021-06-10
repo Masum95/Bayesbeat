@@ -10,11 +10,30 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import MyFile, WatchDistributionModel
-from .serializers import MyFileSerializer
+from .models import MyFile, WatchDistributionModel, UserHealthProfile
+from .serializers import MyFileSerializer, UserHealthProfileSerializer
 from user_profile import pagination, enums
 
 from django.views.decorators.csrf import csrf_exempt
+
+
+class MedicalProfileView(ListCreateAPIView):
+
+    serializer_class = UserHealthProfileSerializer
+    pagination_class = pagination.CustomPagination
+
+    def get_queryset(self):
+        return UserHealthProfile.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        return super(MedicalProfileView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        print(request.POST)
+
+
+
+        return super(MedicalProfileView, self).post(request, *args, **kwargs)
 
 
 class MyFileView(ListCreateAPIView):
@@ -29,21 +48,39 @@ class MyFileView(ListCreateAPIView):
     def filter_queryset(self, queryset):
         print(enums.FileSourceChoices.WATCH.name)
         query_params = self.request.query_params
-        if 'start_time' in query_params:
-            queryset = queryset.get_after_time(start_time=query_params.get('start_time'))
-        if 'end_time' in query_params:
-            queryset = queryset.get_before_time(end_time=query_params.get('end_time'))
+        start_time = query_params.get('start_time')
+        end_time = query_params.get('end_time')
+        if 'registration_id' in query_params:
+            distroDetails = WatchDistributionModel.objects.get(registration_id=query_params.get('registration_id'))
+            if not start_time:
+                start_time =  distroDetails.start_time
+            else:
+                start_time = max(distroDetails.start_time, start_time)
+
+            if not end_time:
+                end_time = distroDetails.end_time
+            else:
+                end_time = min(distroDetails.end_time, end_time)
+
+            if start_time:
+                queryset = queryset.get_after_time(start_time=query_params.get('start_time'))
+            if end_time:
+                queryset = queryset.get_before_time(end_time=query_params.get('end_time'))
+
+            queryset = queryset.filter(device_id=distroDetails.watch_id)
+
         if 'device_id' in query_params:
             queryset = queryset.filter(device_id=query_params.get('device_id'))
-        if 'phone_num' in query_params:
-            distribution = WatchDistributionModel.objects.get(phone=query_params.get('phone_num'))
-            device_id = distribution.watch_id
-            start_time = distribution.start_time
-            end_time = distribution.end_time
-            queryset = queryset.filter(device_id=device_id).get_after_time(start_time=start_time)
 
-            if end_time is not None:
-                queryset = queryset.get_before_time(end_time=end_time)
+        # if 'phone_num' in query_params:
+        #     distribution = WatchDistributionModel.objects.get(phone=query_params.get('phone_num'))
+        #     device_id = distribution.watch_id
+        #     start_time = distribution.start_time
+        #     end_time = distribution.end_time
+        #     queryset = queryset.filter(device_id=device_id).get_after_time(start_time=start_time)
+        #
+        #     if end_time is not None:
+        #         queryset = queryset.get_before_time(end_time=end_time)
 
         if 'selective' in query_params:
             queryset = queryset.filter(file_src=enums.FileSourceChoices.WATCH).filter(has_sent_to_mobile=False)
@@ -83,16 +120,17 @@ def file_ack_view(request):
 
 @api_view(('GET',))
 @renderer_classes(( JSONRenderer,))
-def isValidPHone(request):
+def get_watch_id(request):
     query_params = request.GET
     phone_num = query_params.get('phone_num')
+    user_name = query_params.get('user_name')
     print(phone_num)
     distroDetails = None
     try:
-        distroDetails = WatchDistributionModel.objects.get(phone=phone_num)
+        distroDetails = WatchDistributionModel.objects.get(phone=phone_num, user_name=user_name)
         print('---------', distroDetails)
 
-        return JsonResponse({'status': "success", 'device_id': distroDetails.watch_id}, safe=False)  # or JsonResponse({'data': data})
+        return JsonResponse({'status': "success", 'device_id': distroDetails.watch_id, 'registration_id': distroDetails.registration_id}, safe=False)  # or JsonResponse({'data': data})
     except ObjectDoesNotExist:
         print('nai ksu ')
         # return Response({'status': 'details'}, status=status.HTTP_404_NOT_FOUND)

@@ -2,7 +2,14 @@ from django.contrib import admin
 from user_profile import models
 
 admin.site.register(models.MyFile)
-admin.site.register(models.WatchDistributionModel)
+admin.site.register(models.UserHealthProfile)
+
+
+class WatchDistributionModelAdmin(admin.ModelAdmin):
+    readonly_fields=('registration_id',)
+
+admin.site.register(models.WatchDistributionModel, WatchDistributionModelAdmin)
+
 
 #
 # @admin.register(models.SupplyOrder)

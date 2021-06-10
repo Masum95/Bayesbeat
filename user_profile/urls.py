@@ -13,6 +13,7 @@ urlpatterns = [
 
     path('upload/', MyFileView.as_view(), name='home'),
     path('ack/', file_ack_view, name='ack'),
-    path('isValidPhone/', isValidPHone, name='isValidPhone')
+    path('watch_id/', get_watch_id, name='isValidPhone'),
+    path('medical_profile/', MedicalProfileView.as_view(), name='medical_profile'),
 
 ]

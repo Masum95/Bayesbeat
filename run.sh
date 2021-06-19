@@ -15,5 +15,5 @@ pip install -r requirements.txt
 # migrate the database
 python manage.py migrate
 
-# running the server on default (8000) port
-python manage.py runserver
+# running the server on (8080) port
+python manage.py runserver 0.0.0.0:8000

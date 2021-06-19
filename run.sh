@@ -16,4 +16,4 @@ pip install -r requirements.txt
 python manage.py migrate
 
 # running the server on (8080) port
-python manage.py runserver 0.0.0.0:8000
+python manage.py runserver 0.0.0.0:8080

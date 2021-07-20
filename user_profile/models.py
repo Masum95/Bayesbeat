@@ -51,21 +51,59 @@ class UserHealthProfile(models.Model):
     user = models.ForeignKey(WatchDistributionModel, on_delete=models.CASCADE)
     height = models.CharField(max_length=20, blank=True, null=True)
     weight = models.CharField(max_length=20, blank=True, null=True)
+    name = models.CharField(max_length=50, blank=True, null=True)
 
+    contact = models.CharField(max_length=20, blank=True, null=True)
     dob = models.DateField(auto_now_add=False, blank=True, null=True)
-    gender = models.CharField(
-        max_length=5,
-        choices=enums.GenderChoice.choices,
+    has_heart_disease = models.CharField(
+        max_length=7,
+        choices=enums.BinaryChoices.choices,
         blank=True,
         null=True
     )
-
-    blood_group = models.CharField(
-        max_length=5,
-        choices=enums.BloodGroupChoices.choices,
+    has_parent_heart_disease = models.CharField(
+        max_length=7,
+        choices=enums.BinaryChoices.choices,
         blank=True,
         null=True
     )
+    has_hyper_tension = models.CharField(
+        max_length=7,
+        choices=enums.BinaryChoices.choices,
+        blank=True,
+        null=True
+    )
+    has_covid = models.CharField(
+        max_length=7,
+        choices=enums.BinaryChoices.choices,
+        blank=True,
+        null=True
+    )
+    has_smoking = models.CharField(
+        max_length=7,
+        choices=enums.BinaryChoices.choices,
+        blank=True,
+        null=True
+    )
+    has_eating_outside = models.CharField(
+        max_length=20,
+        choices=enums.EatingFrequencyChoices.choices,
+        blank=True,
+        null=True
+    )
+    # gender = models.CharField(
+    #     max_length=5,
+    #     choices=enums.GenderChoice.choices,
+    #     blank=True,
+    #     null=True
+    # )
+    # 
+    # blood_group = models.CharField(
+    #     max_length=5,
+    #     choices=enums.BloodGroupChoices.choices,
+    #     blank=True,
+    #     null=True
+    # )
 
 
 

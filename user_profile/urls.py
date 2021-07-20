@@ -15,5 +15,6 @@ urlpatterns = [
     path('ack/', file_ack_view, name='ack'),
     path('watch_id/', get_watch_id, name='isValidPhone'),
     path('medical_profile/', MedicalProfileView.as_view(), name='medical_profile'),
+    path('pdf/', pdfGenerate, name='pdf'),
 
 ]

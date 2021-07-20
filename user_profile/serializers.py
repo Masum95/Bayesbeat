@@ -46,13 +46,24 @@ class MyFileSerializer(serializers.ModelSerializer):
 
 
 class UserHealthProfileSerializer(serializers.ModelSerializer):
-    registration_id = serializers.CharField(write_only=True)
-
+    registration_id = serializers.CharField(max_length=255, allow_null= True, write_only=True)
 
     class Meta:
         model = UserHealthProfile
         fields = '__all__'
-        extra_kwargs = {"user": {"required": False}}
+        extra_kwargs = {"user":  {'allow_null': True, 'required': False},
+
+                        }
+
+    # def to_internal_value(self, data):
+    #
+    #     print(data)
+    #     print("--+++++++++---")
+    #     return
+    def to_internal_value(self, data):
+        if 'dob' in data and  data['dob'] == '':
+            data['dob'] = None
+        return super().to_internal_value(data)
 
     def create(self, validated_data):
         """
@@ -62,8 +73,10 @@ class UserHealthProfileSerializer(serializers.ModelSerializer):
         print(self.errors)
         registration_id = validated_data.pop('registration_id')
         distroDetails = WatchDistributionModel.objects.get(registration_id=registration_id)
+        profile, created = UserHealthProfile.objects.get_or_create(user=distroDetails)
 
-        healthProfile = UserHealthProfile.objects.create(user=distroDetails,
-                                           **validated_data)
-        return healthProfile
+        for attr, value in validated_data.items():
+            setattr(profile, attr, value)
+        profile.save()
+        return profile
 

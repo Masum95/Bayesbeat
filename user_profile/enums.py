@@ -18,8 +18,19 @@ class BloodGroupChoices(TextChoices):
     ON = 'O-', 'O-'
 
 
+
 class GenderChoice(TextChoices):
-    MALE = 'M', _('Male')
+    MALE = 'Male', _('Male')
     FEMALE = 'F', _('Female')
     OTHER = 'O', _('Other')
 
+
+class BinaryChoices(TextChoices):
+    YES = 'Yes', _('Yes')
+    NO = 'No', _('No')
+
+
+class EatingFrequencyChoices(TextChoices):
+    FREQUENTLY = 'Frequently', _('Frequently')
+    SOMETIMES = 'Sometimes', _('Sometimes')
+    NEVER = 'Never', _('Never')

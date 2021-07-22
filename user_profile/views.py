@@ -1,7 +1,6 @@
 import json
 import os
 
-import pdfkit
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import get_template

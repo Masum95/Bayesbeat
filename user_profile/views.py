@@ -21,6 +21,7 @@ from user_profile import pagination, enums
 import numpy as np
 from django.views.decorators.csrf import csrf_exempt
 
+from .signal_analysis.model_runner import get_prediction
 from .signal_analysis.pdf_generation import processed_sig_from_file, pdf_generate
 
 
@@ -150,6 +151,8 @@ def get_watch_id(request):
 
 
 def pdfGenerate(request):
+    model_path = os.path.join(settings.BASE_DIR, "user_profile" , "signal_analysis" , "bayesbeat_cpu.pt")
+
     query_params = request.GET
     queryset = getMyFilteredFileList(query_params)
     regi_id = query_params.get('registration_id')
@@ -175,10 +178,12 @@ def pdfGenerate(request):
         else:
             final_output_concat_list = np.concatenate((final_output_concat_list, final_output), axis=0)
         timestamp_concat_list = timestamp_concat_list + [int(timestamp) ] * len(final_output)
-
     print(len(final_output_concat_list))
     print(timestamp_concat_list)
-    pdf_generate(output_file_name, final_output_concat_list, ["Suspected AF"] * len(final_output_concat_list), timestamp_concat_list)
+    preds_list = map(lambda x: 'Suspected Af' if x ==1 else 'Non-Af', get_prediction(model_path, final_output_concat_list ))
+
+    print(get_prediction(model_path, final_output_concat_list ))
+    pdf_generate(output_file_name, final_output_concat_list, preds_list , timestamp_concat_list)
     test_file = open(os.path.join(settings.BASE_DIR, output_file_name+'.pdf'), 'rb')
     response = HttpResponse(content=test_file)
     response['Content-Type'] = 'application/pdf'

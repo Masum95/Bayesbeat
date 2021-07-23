@@ -1,3 +1,5 @@
+import io
+
 import numpy as np
 import heartpy as hp
 
@@ -6,18 +8,25 @@ import sys
 from sklearn.preprocessing import scale
 from sklearn.preprocessing import minmax_scale
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
+
 import datetime
 import pandas as pd
 import os
-
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 # Commented out IPython magic to ensure Python compatibility.
 # %%capture
 #
 # !wget https://c.ndtvimg.com/2020-08/1cvf367_yellow-cat_625x300_25_August_20.jpg -O p1.jpg
 # !wget https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/close-up-of-cat-wearing-sunglasses-while-sitting-royalty-free-image-1571755145.jpg -O p2.jpg
 from Bayesbeat import settings
+
+from urllib.request import Request, urlopen  # Python 3
+
+
+
 
 sample_rate = 10
 
@@ -191,7 +200,17 @@ def preprocess_bayesbeat(raw, sample_rate=10):
 
 
 def processed_sig_from_file(file_path):
-    df = pd.read_csv(file_path)
+    # req = Request(file_path)
+    # req.add_header('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0')
+    # content = urlopen(req)
+    import requests
+
+    response = requests.get(file_path)
+
+    file_object = io.StringIO(response.content.decode('utf-8'))
+    print(response)
+    print(file_object)
+    df = pd.read_csv(file_object)
     raw = df.values[:, 1]
     return preprocess_bayesbeat(raw)
 

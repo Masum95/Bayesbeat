@@ -19,6 +19,7 @@ class MyFile(models.Model):
     file_name = models.CharField(max_length=75)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now_add=False)
+    unix_timestamp_string = models.CharField(max_length=50, default='')
     device_id = models.CharField(max_length=50)
     has_sent_to_mobile = models.BooleanField(default=False)
     file_src =  models.CharField(

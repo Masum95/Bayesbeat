@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 
@@ -17,7 +18,7 @@ from Bayesbeat import settings
 from .models import MyFile, WatchDistributionModel, UserHealthProfile
 from .serializers import MyFileSerializer, UserHealthProfileSerializer
 from user_profile import pagination, enums
-
+import numpy as np
 from django.views.decorators.csrf import csrf_exempt
 
 from .signal_analysis.pdf_generation import processed_sig_from_file, pdf_generate
@@ -152,15 +153,32 @@ def pdfGenerate(request):
     query_params = request.GET
     queryset = getMyFilteredFileList(query_params)
     regi_id = query_params.get('registration_id')
-    user_name = UserHealthProfile.objects.get(user=regi_id).name
+    distroDetails = WatchDistributionModel.objects.get(registration_id=regi_id)
+    user_name = UserHealthProfile.objects.get(user=distroDetails).name
     output_file_name = user_name + "record" if user_name else regi_id + "record"
-    print(MyFileSerializer(queryset, many=True).data[0])
-    file_name = MyFileSerializer(queryset, many=True).data[0]['file']
-    # file_ = open(file_name)
+    file_results =  MyFileSerializer(queryset, many=True).data
+    file_List = [(data['file'], data['unix_timestamp_string']) for data in file_results]
+    print("--------------------------------------------")
+    print(file_List)
 
-    (final_output, layer6_output, new_freq) = processed_sig_from_file(file_name)
+    final_output_concat_list = np.array([])
+    timestamp_concat_list = []
+    for file in file_List:
+        file_name = file[0]
+        timestamp = file[1]
 
-    pdf_generate(output_file_name, final_output, ["Suspected AF"] * len(final_output), [1606507067] * len(final_output))
+        (final_output, layer6_output, new_freq) = processed_sig_from_file(file_name)
+        print(final_output.shape)
+        print(final_output_concat_list.shape)
+        if final_output_concat_list.size == 0:
+            final_output_concat_list = final_output
+        else:
+            final_output_concat_list = np.concatenate((final_output_concat_list, final_output), axis=0)
+        timestamp_concat_list = timestamp_concat_list + [int(timestamp) ] * len(final_output)
+
+    print(len(final_output_concat_list))
+    print(timestamp_concat_list)
+    pdf_generate(output_file_name, final_output_concat_list, ["Suspected AF"] * len(final_output_concat_list), timestamp_concat_list)
     test_file = open(os.path.join(settings.BASE_DIR, output_file_name+'.pdf'), 'rb')
     response = HttpResponse(content=test_file)
     response['Content-Type'] = 'application/pdf'

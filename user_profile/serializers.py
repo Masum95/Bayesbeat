@@ -13,6 +13,8 @@ class MyFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyFile
         fields = '__all__'
+        extra_kwargs = {"unix_timestamp_string":  {'allow_null': True, 'required': False},
+                        }
 
     def to_internal_value(self, data):
         """
@@ -20,9 +22,11 @@ class MyFileSerializer(serializers.ModelSerializer):
         converts institute's uuid to id
         """
         print(data, data['file'].name)
+        data['unix_timestamp_string'] = data['timestamp']
         datetime_obj_with_tz = make_aware(datetime.fromtimestamp(int(data['timestamp'])))
         data['timestamp'] = datetime_obj_with_tz
         data['file_name'] = data['file'].name
+        print(data)
         return super(MyFileSerializer, self).to_internal_value(data)
 
     def create(self, validated_data):
@@ -52,7 +56,6 @@ class UserHealthProfileSerializer(serializers.ModelSerializer):
         model = UserHealthProfile
         fields = '__all__'
         extra_kwargs = {"user":  {'allow_null': True, 'required': False},
-
                         }
 
     # def to_internal_value(self, data):
